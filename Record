@@ -1,0 +1,64 @@
+function getData() {
+  // 🔧 Spreadsheet ID ของ Google Sheet (ดูจาก URL)
+  let spreadsheetId = "YOUR_SPREADSHEET_ID_HERE";
+
+  // 🔧 ชื่อชีตที่ต้องการอ่านข้อมูล (เช่น "Sheet1")
+  let sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName("YOUR_SHEET_NAME_HERE");
+
+  if (!sheet) {
+    Logger.log("❌ ไม่พบชีตชื่อที่ระบุ กรุณาตรวจสอบชื่อชีตอีกครั้ง");
+    return;
+  }
+
+  let data = sheet.getDataRange().getDisplayValues();
+  let message = "";
+
+  // ✅ แปลงวันที่วันนี้เป็นรูปแบบ dd/mm/yy (พ.ศ.)
+  let todayDate = new Date();
+  let day = String(todayDate.getDate()).padStart(2, '0');
+  let month = String(todayDate.getMonth() + 1).padStart(2, '0');
+  let year = String(todayDate.getFullYear() + 543).slice(-2);
+  let today = `${day}/${month}/${year}`;
+
+  Logger.log("📅 วันนี้คือ: " + today);
+
+  for (let i = 1; i < data.length; i++) {
+    let rawDate = data[i][2].trim();
+    let formattedDate = rawDate.replace(/\s/g, "");
+
+    if (formattedDate === today) {
+      message += `📌 *ลำดับ*: ${data[i][0]}\n`;
+      message += `🔢 *เลขที่บันทึกข้อความ*: ${data[i][1]}\n`;
+      message += `📅 *วันที่*: ${data[i][2]}\n`;
+      message += `📖 *เรื่อง*: ${data[i][3]}\n`;
+      message += `✍️ *ลายมือชื่อ*: ${data[i][5]}\n\n`;
+    }
+  }
+
+  if (message !== "") {
+    // 🔧 Telegram Bot Token จาก @BotFather
+    let token = "YOUR_BOT_TOKEN_HERE";
+
+    // 🔧 Chat ID ของผู้รับข้อความ
+    let chatId = "YOUR_CHAT_ID_HERE";
+
+    let telegramUrl = 'https://api.telegram.org/bot' + token + '/sendMessage';
+
+    let payload = {
+      'chat_id': chatId,
+      'text': message,
+      'parse_mode': 'Markdown'
+    };
+
+    let options = {
+      'method': 'post',
+      'contentType': 'application/json',
+      'payload': JSON.stringify(payload)
+    };
+
+    UrlFetchApp.fetch(telegramUrl, options);
+    Logger.log("✅ ส่งข้อความเรียบร้อย");
+  } else {
+    Logger.log("❌ ไม่มีรายการใหม่ตรงกับวันที่วันนี้");
+  }
+}
