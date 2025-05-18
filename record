@@ -1,0 +1,60 @@
+function getData() {
+  let spreadsheetId = "156XrR9Jn30wNiciPhHraHVYAdiyQD-v1-yNpV7oxUNI";
+  let spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+  let sheet = spreadsheet.getSheetByName("thairath");
+
+  if (!sheet) {
+    Logger.log("ไม่พบชีตชื่อ 'thairath'");
+    return;
+  }
+
+  let data = sheet.getDataRange().getDisplayValues();
+  let message = "";
+
+  // ✅ แปลงวันที่วันนี้เป็นรูปแบบ dd/mm/yy (พ.ศ.)
+  let todayDate = new Date();
+  let day = String(todayDate.getDate()).padStart(2, '0'); 
+  let month = String(todayDate.getMonth() + 1).padStart(2, '0'); 
+  let year = String(todayDate.getFullYear() + 543).slice(-2); 
+
+  let today = `${day}/${month}/${year}`;  
+  Logger.log("Today's date (Buddhist yy): '" + today + "'");
+
+  for (let i = 1; i < data.length; i++) {
+    let rawDate = data[i][2].trim(); 
+    let formattedDate = rawDate.replace(/\s/g, ""); 
+
+    if (formattedDate === today) {
+      message += `📌 *ลำดับ*: ${data[i][0]}\n`;
+      message += `🔢 *เลขที่บันทึกข้อความ*: ${data[i][1]}\n`;
+      message += `📅 *วันที่*: ${data[i][2]}\n`;
+      message += `📖 *เรื่อง*: ${data[i][3]}\n`;
+      message += `✍️ *ลายมือชื่อ*: ${data[i][5]}\n\n`;
+      Logger.log("✅ Match found! Adding to message.");
+    }
+  }
+
+  // ✅ ส่งข้อความเฉพาะเมื่อมีรายการที่ตรงกับวันนี้เท่านั้น
+  if (message !== "") {
+    let token = "7234237304:AAF9Wju9_RcEugVTStUtva9mDCJruF5oxpg";
+    let chatId = "-1002550642445";
+
+    let telegramUrl = 'https://api.telegram.org/bot' + token + '/sendMessage';
+
+    let payload = {
+      'chat_id': chatId,
+      'text': message,
+      'parse_mode': 'Markdown'
+    };
+
+    let options = {
+      'method': 'post',
+      'contentType': 'application/json',
+      'payload': JSON.stringify(payload)
+    };
+
+    UrlFetchApp.fetch(telegramUrl, options);
+  } else {
+    Logger.log("❌ No new messages today. No Telegram message sent.");
+  }
+}
