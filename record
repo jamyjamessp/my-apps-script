@@ -1,10 +1,10 @@
 function getData() {
-  let spreadsheetId = "156XrR9Jn30wNiciPhHraHVYAdiyQD-v1-yNpV7oxUNI";
+  let spreadsheetId = "ใส่ไอดีชีท";
   let spreadsheet = SpreadsheetApp.openById(spreadsheetId);
-  let sheet = spreadsheet.getSheetByName("thairath");
+  let sheet = spreadsheet.getSheetByName("ใส่ชื่อชีท");
 
   if (!sheet) {
-    Logger.log("ไม่พบชีตชื่อ 'thairath'");
+    Logger.log("ไม่พบชีตชื่อ 'ใส่ชื่อชีท'");
     return;
   }
 
@@ -36,8 +36,8 @@ function getData() {
 
   // ✅ ส่งข้อความเฉพาะเมื่อมีรายการที่ตรงกับวันนี้เท่านั้น
   if (message !== "") {
-    let token = "7234237304:AAF9Wju9_RcEugVTStUtva9mDCJruF5oxpg";
-    let chatId = "-1002550642445";
+    let token = "ใส่โทเคนบอท";
+    let chatId = "ใส่แชทไอดี";
 
     let telegramUrl = 'https://api.telegram.org/bot' + token + '/sendMessage';
 
